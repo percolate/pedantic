@@ -1,5 +1,10 @@
 .. include:: ../README.rst
 
+TODO:
+* Explain required format of whitelist and schema with examples
+* Put this schtick in docker as microservice
+* Use in Hotlanta
+
 
 API Validator
 -------------
@@ -14,10 +19,17 @@ Service API
 
 .. autoflask:: pedantic.validator_service:app
   :undoc-static:
-  :undoc-endpoints: validator
 
-.. autosimple:: pedantic.validator_service.validator
 
+Implementation Methods
+----------------------
+
+TODO
+
+Miscellaneous
+-------------
+
+* To run tests, from top repo directory: `python -m unittest discover --start-directory ./tests/unit/`
 
 Indices and tables
 ==================
