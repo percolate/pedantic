@@ -1,8 +1,7 @@
 from __future__ import unicode_literals
 import json
 import re
-import os
-
+from pprint import pformat
 from collections import namedtuple
 
 from jsonschema.exceptions import ValidationError
@@ -41,10 +40,28 @@ def parse_data(json_data):
         namedtuple(Response) response: the data payload of the mock response
         dict query_data: query string items
     """
+
+    # Ensure we have everything we need to before parsing
+    required = ['path_info', 'request_method']
+    if not all(json_data.get(item) for item in required):
+        msg = 'The following fields are required: {}'.format(required)
+        raise ValueError(msg)
+
+    one_of = ['request', 'response']
+    if not any(json_data.get(item) for item in one_of):
+        msg = 'One or more of the following fields are required: {}'\
+            .format(required)
+        raise ValueError(msg)
+
+    optional = ['query_string', 'request', 'response', 'status_code']
+    for item in optional:
+        if item not in json_data:
+            json_data[item] = None
+
     query_data = json_data['query_string']
     if query_data:
         query_data = parse_qs(
-            json_data['query_string'],
+            query_data,
             keep_blank_values=True
         )
         for key in query_data:
@@ -56,17 +73,28 @@ def parse_data(json_data):
                 for idx, val in enumerate(query_data[key]):
                     query_data[key][idx] = _parse_from_string(val)
 
+    request = None
+    if json_data['request']:
+        request = Request(
+            request_data=json_data['request'],
+            query_data=query_data
+        )
+
+    response = None
+    if json_data['response'] and json_data['status_code']:
+        response = Response(
+            response_data=json_data['response'],
+            status_code=json_data['status_code']
+        )
+    elif json_data['response']:
+        msg = 'A `response` must be accompanied by a value in `status_code`.'
+        raise ValueError(msg)
+
     return Data(
             path=json_data['path_info'],
             method=json_data['request_method'],
-            request=Request(
-                request_data=json_data['request'],
-                query_data=query_data
-            ),
-            response=Response(
-                response_data=json_data['response'],
-                status_code=json_data['status_code']
-            ),
+            request=request,
+            response=response
     )
 
 

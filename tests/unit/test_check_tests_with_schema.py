@@ -419,12 +419,12 @@ class ParserTestCase(unittest.TestCase):
     def setUp(self):
         qs = 'a_string=the%20string&a_number=1&list=a%20str%2C4&a_bool=true'
         self.request_w_query_string = {
-            'path_info': '/api/v3/media/',
+            'path_info': '/api/v5/test/',
             'query_string': qs,
             'request_method': 'POST',
             'status_code': 200,
-            'request': {},
-            'response': {},
+            'request': {'x': 'data'},
+            'response': {'some': 'dummy_data'},
         }
 
     def test_parse_request_handles_query_string_types(self):
@@ -453,6 +453,48 @@ class ParserTestCase(unittest.TestCase):
         expected = {'list_item': [1, 2, 3]}
         self.assertEquals(data.request.query_data, expected)
         self.assertIsInstance(data.request.query_data['list_item'], list)
+
+    def test_parse_request_raises_when_missing_required_path_field(self):
+        # Asserts on Falsy
+        self.request_w_query_string['path_info'] = None
+        with self.assertRaises(ValueError):
+            parse_data(self.request_w_query_string)
+        # Asserts when missing
+        del self.request_w_query_string['path_info']
+        with self.assertRaises(ValueError):
+            parse_data(self.request_w_query_string)
+
+    def test_parse_request_raises_when_missing_required_method_field(self):
+        # Asserts on Falsy
+        self.request_w_query_string['request_method'] = None
+        with self.assertRaises(ValueError):
+            parse_data(self.request_w_query_string)
+        # Asserts when missing
+        del self.request_w_query_string['request_method']
+        with self.assertRaises(ValueError):
+            parse_data(self.request_w_query_string)
+
+    def test_parse_request_raises_when_missing_both_one_of_fields(self):
+        # Asserts on Falsy
+        self.request_w_query_string['request'] = None
+        self.request_w_query_string['response'] = None
+        with self.assertRaises(ValueError):
+            parse_data(self.request_w_query_string)
+        # Asserts when missing
+        del self.request_w_query_string['request']
+        del self.request_w_query_string['response']
+        with self.assertRaises(ValueError):
+            parse_data(self.request_w_query_string)
+
+    def test_parse_request_raises_when_response_missing_status_field(self):
+        # Asserts on Falsy
+        self.request_w_query_string['status_code'] = None
+        with self.assertRaises(ValueError):
+            parse_data(self.request_w_query_string)
+        # Asserts when missing
+        del self.request_w_query_string['status_code']
+        with self.assertRaises(ValueError):
+            parse_data(self.request_w_query_string)
 
 
 class WhiteListTestCase(unittest.TestCase):
