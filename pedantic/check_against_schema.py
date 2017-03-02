@@ -98,13 +98,12 @@ def parse_data(json_data):
 
 
 def is_whitelisted(info, whitelist):
-    if hasattr(info, 'request'):
-        path = info.request['path_info']
-        method = info.request['method']
-        code = info.status_code
+    path = info.path
+    method = info.method
+
+    if hasattr(info, 'response'):
+        code = info.response.status_code
     else:
-        path = info['path_info']
-        method = info['method']
         code = None
 
     for item in whitelist:
@@ -120,6 +119,7 @@ def is_whitelisted(info, whitelist):
                     return True
             else:
                 return True
+    return False
 
 
 def _get_path_segments(path_info):

@@ -504,34 +504,32 @@ class WhiteListTestCase(unittest.TestCase):
         self.dummy_method = 'DUMMY_METHOD'
         self.dummy_code = 999
         self.request = Object()
+        setattr(self.request, 'path', self.dummy_path)
         setattr(self.request, 'method', self.dummy_method)
-        setattr(self.request, 'path_info', self.dummy_path)
-
-        self.response = Object()
-        self.response.status_code = self.dummy_code
-        self.response.request = self.request
-
+        response = Object()
+        setattr(response, 'status_code', self.dummy_code)
+        setattr(self.request, 'response', response)
         self.whitelist = [{'path': self.dummy_path}]
 
     def test_is_whitelisted_returns_false_request_path_not_found(self):
-        setattr(self.request, 'path_info', '/some/unfound/path/')
+        setattr(self.request, 'path', '/some/unfound/path/')
         self.assertFalse(is_whitelisted(self.request, self.whitelist))
 
     def test_is_whitelisted_returns_true_request_matching_path(self):
         self.assertTrue(is_whitelisted(self.request, self.whitelist))
 
-    def test_is_whitelisted_returns_true_response_matching_code(self):
+    def test_is_whitelisted_matches_code_returns_true(self):
         self.whitelist[0]['method'] = self.dummy_method
         self.whitelist[0]['code'] = self.dummy_code
-        self.assertTrue(is_whitelisted(self.response, self.whitelist))
-
-    def test_is_whitelisted_true_response_path_matched(self):
-        self.assertTrue(is_whitelisted(self.response, self.whitelist))
+        self.assertTrue(is_whitelisted(self.request, self.whitelist))
 
     def test_is_whitelisted_returns_false_no_match_code(self):
         self.whitelist[0]['method'] = self.dummy_method
         self.whitelist[0]['code'] = 'WONT_MATCH'
-        self.assertFalse(is_whitelisted(self.response, self.whitelist))
+        self.assertFalse(is_whitelisted(self.request, self.whitelist))
+
+    def test_is_whitelisted_true_response_path_matched(self):
+        self.assertTrue(is_whitelisted(self.request, self.whitelist))
 
     def test_is_whitelisted_returns_true_request_match_method(self):
         self.whitelist[0]['method'] = self.dummy_method
@@ -549,16 +547,16 @@ class WhiteListTestCase(unittest.TestCase):
         self.whitelist.append({'path': '/path/3', 'method': 'method3'})
         self.whitelist.append({'path': path_match, 'method': method_match})
         self.whitelist.append({'path': '/path/4', 'method': 'method4'})
-        setattr(self.request, 'path_info', path_match)
+        setattr(self.request, 'path', path_match)
         setattr(self.request, 'method', method_match)
         self.assertTrue(is_whitelisted(self.request, self.whitelist))
 
     def test_when_regex_is_not_greedy(self):
         whitelist = [{'path': '^/some/path/long$'}]
-        setattr(self.request, 'path_info', '/some/path/longer')
+        setattr(self.request, 'path', '/some/path/longer')
         self.assertFalse(is_whitelisted(self.request, whitelist))
 
     def test_when_regex_is_greedy(self):
         whitelist = [{'path': '/some/path/long'}]
-        setattr(self.request, 'path_info', '/some/path/longer')
+        setattr(self.request, 'path', '/some/path/longer')
         self.assertTrue(is_whitelisted(self.request, whitelist))
