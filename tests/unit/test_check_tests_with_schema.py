@@ -5,10 +5,11 @@ from copy import deepcopy
 import json
 import os
 import sys
-from collections import namedtuple
 
 from pedantic.check_against_schema import (
     Data,
+    Request,
+    Response,
     is_whitelisted,
     _find_resource,
     _get_path_segments,
@@ -18,7 +19,6 @@ from pedantic.check_against_schema import (
     get_spec,
     JSONSchemaValidationError,
     UndefinedSchemaError,
-    ResponseNotDefinedError,
 )
 
 
@@ -38,21 +38,24 @@ class ValidatorTestBase(unittest.TestCase):
 
     def setUp(self):
         self.raw_schema = deepcopy(SCHEMAS)
-        self.req_path_info = '/api/v5/test/'
-        self.method = 'post'
-        self.data = {'request': {'x': 'data'}, 'response': {}}
-        self.query_data = {'required_param': 'a string', 'optional_param': 1}
-        self.parsed_data = Data(
-            path=self.req_path_info,
-            method=self.method,
-            request_data=self.data['request'],
-            response_data=self.data['response'],
-            query_data=self.query_data
-        )
-        self.spec = get_spec(self.parsed_data, self.raw_schema)
 
 
 class RequestValidatorTestCase(ValidatorTestBase):
+
+    def setUp(self):
+        super(RequestValidatorTestCase, self).setUp()
+        self.req_path_info = '/api/v5/test/'
+        self.method = 'post'
+        self.request_data = {'x': 'data'}
+        self.query_data = {'required_param': 'a string', 'optional_param': 1}
+        self.dummy_response = Response(response_data={}, status_code=200)
+        self.parsed_data = Data(
+            path=self.req_path_info,
+            method=self.method,
+            request=Request(self.request_data, self.query_data),
+            response=self.dummy_response,
+        )
+        self.spec = get_spec(self.parsed_data, self.raw_schema)
 
     def test_validate_request_against_schema_quiet_on_valid_instance(self):
         """
@@ -66,16 +69,15 @@ class RequestValidatorTestCase(ValidatorTestBase):
         validate_request_against_schema() quiet on valid list param instance
         """
         # check ValidationError is not thrown
-        query_data = {
+        self.query_data = {
             'required_param': 'a string',
             'optional_param': [1, 2, 3, 4, 5]
         }
         req_info = Data(
             path=self.req_path_info,
             method=self.method,
-            request_data=self.data['request'],
-            response_data=self.data['response'],
-            query_data=query_data
+            request=Request(self.request_data, self.query_data),
+            response=self.dummy_response,
         )
         validate_request_against_schema(req_info, self.spec)
 
@@ -84,15 +86,14 @@ class RequestValidatorTestCase(ValidatorTestBase):
         validate_request_against_schema() quiet on valid list param instance
         """
         # check ValidationError is not thrown
-        query_data = {
+        self.query_data = {
             'required_param': 1,
         }
         req_info = Data(
             path=self.req_path_info,
             method=self.method,
-            request_data=self.data['request'],
-            response_data=self.data['response'],
-            query_data=query_data
+            request=Request(self.request_data, self.query_data),
+            response=self.dummy_response,
         )
         validate_request_against_schema(req_info, self.spec)
 
@@ -100,7 +101,8 @@ class RequestValidatorTestCase(ValidatorTestBase):
         """
         validate_request_against_schema() raises multiple types of (sub)errors
         """
-        query_data = {
+        self.request_data = {'x': 1, 'y': [{}, 3, "foo"]}
+        self.query_data = {
             'optional_param': 'not a number',
             'date_param': 'not a date',
             'not_defined_param': 'dummy'
@@ -108,9 +110,8 @@ class RequestValidatorTestCase(ValidatorTestBase):
         req_info = Data(
             path=self.req_path_info,
             method=self.method,
-            request_data={'x': 1, 'y': [{}, 3, "foo"]},
-            response_data=self.data['response'],
-            query_data=query_data
+            request=Request(self.request_data, self.query_data),
+            response=self.dummy_response,
         )
         error_indicator = '-'
         suberror_indicator = '>'  # for sub schema errors
@@ -130,7 +131,7 @@ class RequestValidatorTestCase(ValidatorTestBase):
         validate_request_against_schema() raises on invalid date list param
         """
         # check ValidationError is not thrown
-        query_data = {
+        self.query_data = {
             'required_param': 'a string',
             'date_param': [
                 '2016-06-14T13:58:32+00:00',
@@ -140,9 +141,8 @@ class RequestValidatorTestCase(ValidatorTestBase):
         req_info = Data(
             path=self.req_path_info,
             method=self.method,
-            request_data=self.data['request'],
-            response_data=self.data['response'],
-            query_data=query_data
+            request=Request(self.request_data, self.query_data),
+            response=self.dummy_response,
         )
         with self.assertRaises(JSONSchemaValidationError):
             validate_request_against_schema(req_info, self.spec)
@@ -151,12 +151,12 @@ class RequestValidatorTestCase(ValidatorTestBase):
         """
         validate_request_against_schema() JSONSchemaValidationError on bad data
         """
+        self.request_data = {'x': 1}
         req_info = Data(
             path=self.req_path_info,
             method=self.method,
-            request_data={'x': 1},
-            response_data=self.data['response'],
-            query_data=self.query_data
+            request=Request(self.request_data, self.query_data),
+            response=self.dummy_response,
         )
         with self.assertRaises(JSONSchemaValidationError):
             validate_request_against_schema(req_info, self.spec)
@@ -165,12 +165,12 @@ class RequestValidatorTestCase(ValidatorTestBase):
         """
         validate_request_against_schema() raise on missing required query param
         """
+        self.query_data = {'optional_param': 1}
         req_info = Data(
             path=self.req_path_info,
             method=self.method,
-            request_data=self.data['request'],
-            response_data=self.data['response'],
-            query_data={'optional_param': 1}
+            request=Request(self.request_data, self.query_data),
+            response=self.dummy_response,
         )
         with self.assertRaises(JSONSchemaValidationError):
             validate_request_against_schema(req_info, self.spec)
@@ -179,12 +179,15 @@ class RequestValidatorTestCase(ValidatorTestBase):
         """
         validate_request_against_schema() raises for undefined schema field
         """
+        self.query_data = {
+            'required_param': "dummy",
+            'not_defined': "dummy"
+        }
         req_info = Data(
             path=self.req_path_info,
             method=self.method,
-            request_data=self.data['request'],
-            response_data=self.data['response'],
-            query_data={'required_param': "dummy", 'not_defined': "dummy"}
+            request=Request(self.request_data, self.query_data),
+            response=self.dummy_response
         )
         with self.assertRaises(JSONSchemaValidationError):
             validate_request_against_schema(req_info, self.spec)
@@ -193,35 +196,18 @@ class RequestValidatorTestCase(ValidatorTestBase):
         """
         validate_request_against_schema() JSONSchemaValidationError on bad query
         """
-        req_info = Data(
-            path=self.req_path_info,
-            method=self.method,
-            request_data=self.data['request'],
-            response_data=self.data['response'],
-            query_data={
-                'required_param': 'dummy',
-                'optional_param': 'should be num'
-            }
-        )
-        with self.assertRaises(JSONSchemaValidationError):
-            validate_request_against_schema(req_info, self.spec)
-
-    def test_validate_request_against_schema_api_key_only_param(self):
-        """
-        validate_request_against_schema() quiet on api_key only param list
-        """
-        # check ValidationError is not thrown
-        query_data = {
-            'api_key': 'dummy key',
+        self.query_data = {
+            'required_param': "dummy",
+            'not_defined': "should be num"
         }
         req_info = Data(
             path=self.req_path_info,
             method=self.method,
-            request_data=self.data['request'],
-            response_data=self.data['response'],
-            query_data=query_data
+            request=Request(self.request_data, self.query_data),
+            response=self.dummy_response,
         )
-        validate_request_against_schema(req_info, self.spec)
+        with self.assertRaises(JSONSchemaValidationError):
+            validate_request_against_schema(req_info, self.spec)
 
     def test_validate_request_against_schema_queryParameters_missing(
             self):
@@ -238,51 +224,57 @@ class ResponseValidatorTestCase(ValidatorTestBase):
 
     def setUp(self):
         super(ResponseValidatorTestCase, self).setUp()
-        self.Response = namedtuple('Request', 'content request status_code')
-        self.data = u'{"data": { "uni": "¶" }}'
-        self.request_obj = {
-            'request_method': 'POST',
-            'path_info': '/some/random/path'
-        }
+        self.req_path_info = '/api/v5/test/'
+        self.method = 'post'
+        self.dummy_request = Request(request_data={}, query_data={})
+        self.response_data = {'data': {'uni': '¶'}}
         self.status_code = 200
-        self.response = self.Response(
-            content=self.data,
-            request=self.request_obj,
-            status_code=self.status_code
+        self.parsed_data = Data(
+            path=self.req_path_info,
+            method=self.method,
+            request=self.dummy_request,
+            response=Response(
+                response_data=self.response_data,
+                status_code=self.status_code
+            ),
         )
+        self.spec = get_spec(self.parsed_data, self.raw_schema)
 
     def test_validate_response_against_schema_valid_instance(self):
         """
         validate_response_against_schema() quietly completes if valid.
         """
         # check ValidationError is not thrown
-        validate_response_against_schema(self.response, self.spec)
+        validate_response_against_schema(self.parsed_data, self.spec)
 
     def test_validate_response_against_schema_raises_on_invalid_instance(self):
         """
         validate_response_against_schema() raises JSONSchemaValidationError.
         """
-        data = u'{"data": []}'
-        response = self.Response(
-            content=data,
-            request=self.request_obj,
-            status_code=self.status_code
+        parsed_data = Data(
+            path=self.req_path_info,
+            method=self.method,
+            request=self.dummy_request,
+            response=Response(
+                response_data={'data': []},
+                status_code=self.status_code
+            ),
         )
         with self.assertRaises(JSONSchemaValidationError):
-            validate_response_against_schema(response, self.spec)
+            validate_response_against_schema(parsed_data, self.spec)
 
     def test_validate_response_against_schema_raises_response_undefined(self):
         """
-        validate_response_against_schema() raises ResponseNotDefinedError
+        validate_response_against_schema() raises UndefinedSchemaError
         """
         self.raw_schema['resources'][0]['resources'][0]\
             ['methods'][1]['responses'] = {}
         spec = get_spec(self.parsed_data, self.raw_schema)
-        with self.assertRaises(ResponseNotDefinedError):
-            validate_response_against_schema(self.response, spec)
+        with self.assertRaises(UndefinedSchemaError):
+            validate_response_against_schema(self.parsed_data, spec)
 
 
-class GetSpecTestCase(ValidatorTestBase):
+class GetSpecTestCase(RequestValidatorTestCase):
 
     def test__find_schema_deep_endpoint_past_uri_param(self):
         path_segments = {
@@ -340,9 +332,8 @@ class GetSpecTestCase(ValidatorTestBase):
         request_info = Data(
             path=req_path_info,
             method=method,
-            request_data=self.data['request'],
-            response_data=self.data['response'],
-            query_data=self.query_data
+            request=Request(self.request_data, self.query_data),
+            response=self.dummy_response,
         )
         spec = get_spec(request_info, self.raw_schema)
         self.assertEqual(spec['method'], method)
@@ -353,9 +344,8 @@ class GetSpecTestCase(ValidatorTestBase):
         request_info = Data(
             path=req_path_info,
             method=method,
-            request_data=self.data['request'],
-            response_data=self.data['response'],
-            query_data=self.query_data
+            request=Request(self.request_data, self.query_data),
+            response=self.dummy_response,
         )
         spec = get_spec(request_info, self.raw_schema)
         self.assertEqual(spec['method'], method)
@@ -368,9 +358,8 @@ class GetSpecTestCase(ValidatorTestBase):
         request_info = Data(
             path=self.req_path_info,
             method=method,
-            request_data=self.data['request'],
-            response_data=self.data['response'],
-            query_data=self.query_data
+            request=Request(self.request_data, self.query_data),
+            response=self.dummy_response,
         )
         with self.assertRaises(UndefinedSchemaError):
             get_spec(request_info, self.raw_schema)
@@ -391,9 +380,8 @@ class GetSpecTestCase(ValidatorTestBase):
         request_info = Data(
             path=req_path_info,
             method=self.method,
-            request_data=self.data['request'],
-            response_data=self.data['response'],
-            query_data=self.query_data
+            request=Request(self.request_data, self.query_data),
+            response=self.dummy_response,
         )
         with self.assertRaises(UndefinedSchemaError):
             get_spec(request_info, self.raw_schema)
@@ -430,40 +418,41 @@ class ParserTestCase(unittest.TestCase):
 
     def setUp(self):
         qs = 'a_string=the%20string&a_number=1&list=a%20str%2C4&a_bool=true'
-        self.request_w_boundary_string = {
+        self.request_w_query_string = {
             'path_info': '/api/v3/media/',
             'query_string': qs,
             'request_method': 'POST',
-            'request': "{}",
-            'response': "{}"
+            'status_code': 200,
+            'request': {},
+            'response': {},
         }
 
     def test_parse_request_handles_query_string_types(self):
         """
         parse_data() parses types correctly from query string
         """
-        request_info = parse_data(self.request_w_boundary_string)
+        data = parse_data(self.request_w_query_string)
         expected = {
             'a_number': 1,
             'list': ['a str', 4],
             'a_string': 'the string',
             'a_bool': True
         }
-        self.assertEquals(request_info.query_data, expected)
-        self.assertIsInstance(request_info.query_data['a_string'], str)
-        self.assertIsInstance(request_info.query_data['list'], list)
-        self.assertIsInstance(request_info.query_data['a_number'], int)
+        self.assertEquals(data.request.query_data, expected)
+        self.assertIsInstance(data.request.query_data['a_string'], str)
+        self.assertIsInstance(data.request.query_data['list'], list)
+        self.assertIsInstance(data.request.query_data['a_number'], int)
 
     def test_parse_request_handles_both_types_of_list_params(self):
         """
         parse_data() handles list param style `x=1&x=2`
         """
         qs = 'list_item=1&list_item=2&list_item=3'
-        self.request_w_boundary_string['query_string'] = qs
-        request_info = parse_data(self.request_w_boundary_string)
+        self.request_w_query_string['query_string'] = qs
+        data = parse_data(self.request_w_query_string)
         expected = {'list_item': [1, 2, 3]}
-        self.assertEquals(request_info.query_data, expected)
-        self.assertIsInstance(request_info.query_data['list_item'], list)
+        self.assertEquals(data.request.query_data, expected)
+        self.assertIsInstance(data.request.query_data['list_item'], list)
 
 
 class WhiteListTestCase(unittest.TestCase):
