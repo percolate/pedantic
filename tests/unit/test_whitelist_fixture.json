@@ -1,0 +1,3 @@
+[
+    {"path": "/whitelisted/path", "method": "a_method", "code": 999}
+]

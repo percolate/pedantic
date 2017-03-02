@@ -421,7 +421,7 @@ class ParserTestCase(unittest.TestCase):
         self.request_w_query_string = {
             'path_info': '/api/v5/test/',
             'query_string': qs,
-            'request_method': 'POST',
+            'method': 'POST',
             'status_code': 200,
             'request': {'x': 'data'},
             'response': {'some': 'dummy_data'},
@@ -466,11 +466,11 @@ class ParserTestCase(unittest.TestCase):
 
     def test_parse_request_raises_when_missing_required_method_field(self):
         # Asserts on Falsy
-        self.request_w_query_string['request_method'] = None
+        self.request_w_query_string['method'] = None
         with self.assertRaises(ValueError):
             parse_data(self.request_w_query_string)
         # Asserts when missing
-        del self.request_w_query_string['request_method']
+        del self.request_w_query_string['method']
         with self.assertRaises(ValueError):
             parse_data(self.request_w_query_string)
 
@@ -503,9 +503,8 @@ class WhiteListTestCase(unittest.TestCase):
         self.dummy_path = '/some/dummy/path/'
         self.dummy_method = 'DUMMY_METHOD'
         self.dummy_code = 999
-
         self.request = Object()
-        setattr(self.request, 'request_method', self.dummy_method)
+        setattr(self.request, 'method', self.dummy_method)
         setattr(self.request, 'path_info', self.dummy_path)
 
         self.response = Object()
@@ -539,7 +538,7 @@ class WhiteListTestCase(unittest.TestCase):
         self.assertTrue(is_whitelisted(self.request, self.whitelist))
 
     def test_is_whitelisted_returns_false_request_no_match_method(self):
-        setattr(self.request, 'request_method', 'INVALID_METHOD')
+        setattr(self.request, 'method', 'INVALID_METHOD')
         self.whitelist[0]['method'] = self.dummy_method
         self.assertFalse(is_whitelisted(self.request, self.whitelist))
 
@@ -551,7 +550,7 @@ class WhiteListTestCase(unittest.TestCase):
         self.whitelist.append({'path': path_match, 'method': method_match})
         self.whitelist.append({'path': '/path/4', 'method': 'method4'})
         setattr(self.request, 'path_info', path_match)
-        setattr(self.request, 'request_method', method_match)
+        setattr(self.request, 'method', method_match)
         self.assertTrue(is_whitelisted(self.request, self.whitelist))
 
     def test_when_regex_is_not_greedy(self):

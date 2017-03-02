@@ -1,7 +1,6 @@
 from __future__ import unicode_literals
 import json
 import re
-from pprint import pformat
 from collections import namedtuple
 
 from jsonschema.exceptions import ValidationError
@@ -42,7 +41,7 @@ def parse_data(json_data):
     """
 
     # Ensure we have everything we need to before parsing
-    required = ['path_info', 'request_method']
+    required = ['path_info', 'method']
     if not all(json_data.get(item) for item in required):
         msg = 'The following fields are required: {}'.format(required)
         raise ValueError(msg)
@@ -92,7 +91,7 @@ def parse_data(json_data):
 
     return Data(
             path=json_data['path_info'],
-            method=json_data['request_method'],
+            method=json_data['method'],
             request=request,
             response=response
     )
@@ -101,11 +100,11 @@ def parse_data(json_data):
 def is_whitelisted(info, whitelist):
     if hasattr(info, 'request'):
         path = info.request['path_info']
-        method = info.request['request_method']
+        method = info.request['method']
         code = info.status_code
     else:
         path = info['path_info']
-        method = info['request_method']
+        method = info['method']
         code = None
 
     for item in whitelist:
