@@ -1,39 +1,36 @@
-.. include:: ../README.rst
+########
+Pedantic
+########
 
-TODO:
-* Explain required format of whitelist and schema with examples
-* Put this schtick in docker as microservice
-* Use in Hotlanta
+Pedantic is a tool which provides a means to validate API fixtures (aka mocks)
+against a known schema.
 
+About
+=====
 
-API Validator
--------------
+**Who is Pedantic for?**
 
-Command Line
-~~~~~~~~~~~~
+1) Pedantic is for service providers using JSONSchema to define API endpoints.
+2) Pedantic is for any client (front end, mobile etc.) who wishes to automatically maintain test fixtures against the
+   above services.
 
-.. automodule:: pedantic.pedantic
+**How does Pedantic work?**
 
-Service API
-~~~~~~~~~~~
+Here's how it works placeholder.
 
-.. autoflask:: pedantic.validator_service:app
-  :undoc-static:
+**Why does it matter?**
 
+Some placeholder explanation.
 
-Implementation Methods
-----------------------
+Features
+--------
 
-TODO
+* List of features goes here
 
-Miscellaneous
--------------
+.. include:: ./usage.inc
 
-* To run tests, from top repo directory: `python -m unittest discover --start-directory ./tests/unit/`
+License
+=======
 
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
+This library uses the MIT license. See `LICENSE.txt <./LICENSE.txt>`__ for
+more details

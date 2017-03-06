@@ -34,7 +34,7 @@ extensions = [
     'sphinx.ext.autodoc',
     'sphinxcontrib.httpdomain',
     'sphinxcontrib.autohttp.flask',
-    'sphinxcontrib.autohttp.flaskqref',
+    'sphinxcontrib.napoleon',
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -81,6 +81,7 @@ pygments_style = 'sphinx'
 # If true, `todo` and `todoList` produce output, else they produce nothing.
 todo_include_todos = False
 
+add_module_names = False
 
 # -- Options for HTML output ----------------------------------------------
 

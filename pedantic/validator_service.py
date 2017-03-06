@@ -1,4 +1,4 @@
-"""Some placeholder module text"""
+"""Pendantic service providing REST API for fixture validation."""
 
 import json
 
@@ -32,17 +32,32 @@ def set_proxy_settings(schema_arg, whitelist_arg):
 @app.route('/', methods=['POST'])
 def validator():
     """
-    .. http:GET:: /
+    .. http:POST:: /
 
-        Placeholder route doctext.
+        Receives relevant fixture information as POST JSON data payload. The
+        data is validated and the validation result is returned.
 
         **Example request**:
 
         .. code-block:: bash
 
-            curl -i http://localhost:5000/ -d <TODO DATA HERE>
+            curl -X POST -i http://localhost:5000/ --data '{"method":
+            "POST", "path_info": "/api/v5/test/", "request":
+            {"x": "data"}}' -H "Content-Type: application/json"
 
-        :return: The response returned to the proxy.
+        **Example response**:
+
+        .. sourcecode:: http
+
+            HTTP/1.0 200 OK
+            Content-Type: application/json
+            Content-Length: 66
+
+            {
+              "message": "All is well with the world (and your fixture)."
+            }
+
+        :return: On success 200 is returned otherwise 400 with error detail.
 
     """
 

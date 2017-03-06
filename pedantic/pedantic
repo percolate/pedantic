@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """
-Starts the Pedantic service.
+Configure and start the Pedantic service.
 
 Usage:
     pedantic SCHEMA_PATH [--whitelist=<whitelist_path>] [--port=<port_number>]
