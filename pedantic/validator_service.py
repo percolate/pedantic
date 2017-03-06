@@ -61,6 +61,7 @@ def validator():
 
     """
 
+    print('We made it here!')
 
     # params = dict(request.args)
     # print('X: {}'.format(json['x']))
@@ -117,4 +118,4 @@ def validator():
         return jsonify(msg), 200
     else:
         msg = {'message': errors}
-        return msg, 400
+        return jsonify(msg), 400
