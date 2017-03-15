@@ -57,12 +57,9 @@ def validator():
               "message": "All is well with the world (and your fixture)."
             }
 
-        :return: On success 200 is returned otherwise 400 with error detail.
+        :return: On success 200 is returned, otherwise 400 with error detail.
 
     """
-
-    print('We made it here!')
-
     # params = dict(request.args)
     # print('X: {}'.format(json['x']))
     # print("Params: {}".format(params))
@@ -76,14 +73,14 @@ def validator():
 
     if 'application/json' not in request.headers.get('Content-Type'):
         msg = 'Transport header `Content-Type` must be `application/json`.'
-        error = {'message': msg}
+        error = {'error': msg}
         return jsonify(error), 400
 
     json = request.get_json()
     try:
         data = parse_data(json)
     except ValueError as e:
-        msg = {'message': e.message, 'data': json}
+        msg = {'error': e.message, 'data': json}
         return jsonify(msg), 400
 
     # Get the specific schema under test
@@ -92,10 +89,11 @@ def validator():
     except UndefinedSchemaError as e:
         if whitelist:
             if is_whitelisted(data, whitelist):
-                msg = 'Requested endpoint is whitelisted against validation.'
-                value = {'message': msg}
+                msg = 'Requested endpoint `{}` is whitelisted against ' \
+                      'validation.'.format(data.path)
+                value = {'warning': msg}
                 return jsonify(value), 200
-        msg = {'message': e.message}
+        msg = {'error:': e.message}
         return jsonify(msg), 400
 
     # Validate the request and/or response
@@ -117,5 +115,5 @@ def validator():
         msg = {'message': 'All is well with the world (and your fixture).'}
         return jsonify(msg), 200
     else:
-        msg = {'message': errors}
+        msg = {'error': errors}
         return jsonify(msg), 400

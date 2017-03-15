@@ -49,9 +49,9 @@ def parse_data(json_data):
         raise ValueError(msg)
 
     one_of = ['request', 'response']
-    if not any(json_data.get(item) for item in one_of):
+    if not any(item in json_data for item in one_of):
         msg = 'One or more of the following fields are required: {}'\
-            .format(required)
+            .format(one_of)
         raise ValueError(msg)
 
     optional = ['query_string', 'request', 'response', 'status_code']
@@ -91,6 +91,10 @@ def parse_data(json_data):
         msg = 'A `response` must be accompanied by a value in `status_code`.'
         raise ValueError(msg)
 
+    if not json_data['path_info'].startswith("/"):
+        msg = 'Path info must begin with `/`.'
+        raise ValueError(msg)
+
     return Data(
             path=json_data['path_info'],
             method=json_data['method'],
@@ -103,7 +107,7 @@ def is_whitelisted(info, whitelist):
     path = info.path
     method = info.method
 
-    if hasattr(info, 'response'):
+    if info.response:
         code = info.response.status_code
     else:
         code = None
