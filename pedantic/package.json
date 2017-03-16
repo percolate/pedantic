@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "raml-parser": "0.8.15"
+  }
+}
