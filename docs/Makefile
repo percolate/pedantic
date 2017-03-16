@@ -4,7 +4,7 @@
 # You can set these variables from the command line.
 SPHINXOPTS    =
 SPHINXBUILD   = sphinx-build
-SPHINXPROJ    = Bond
+SPHINXPROJ    = Pedantic
 SOURCEDIR     = .
 BUILDDIR      = _build
 
@@ -28,6 +28,6 @@ help:
 
 html:
 	rm -rf $(BUILDDIR)/*
-	$(SPHINXBUILD) -E -b html $(SPHINXOPTS) . $(BUILDDIR)
+	$(SPHINXBUILD) -E -a -b html $(SPHINXOPTS) . $(BUILDDIR)
 	@echo
 	@echo "Build finished. The HTML pages are in $(BUILDDIR)/html."

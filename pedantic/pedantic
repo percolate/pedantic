@@ -8,9 +8,6 @@ Usage:
 Example:
     pedantic /path/to/schema/file.json --whitelist=/path/whitelist.json
 
-Arguments:
-    SCHEMA_PATH                     The path to the schema file used in validation.
-
 Options:
     -h, --help                      Show this screen and exit.
     --version                       Show version.
@@ -18,6 +15,7 @@ Options:
     --port=<port_number>            Set the port number of the proxy, default `5000`.
 
 """
+
 
 from docopt import docopt
 
