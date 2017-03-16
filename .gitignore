@@ -4,3 +4,7 @@
 docs/_build/
 docs/_static/
 docs/_templates/
+index.raml
+schema.json
+whitelist.json
+node_modules/
