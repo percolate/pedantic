@@ -15,5 +15,5 @@ Validate your API test fixtures.
 License
 =======
 
-This library uses the MIT license. See `LICENSE.txt <./LICENSE.txt>`__ for
+This library uses the MIT license. See `LICENSE.txt <../LICENSE.txt>`__ for
 more details
