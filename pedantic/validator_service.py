@@ -60,17 +60,6 @@ def validator():
         :return: On success 200 is returned, otherwise 400 with error detail.
 
     """
-    # params = dict(request.args)
-    # print('X: {}'.format(json['x']))
-    # print("Params: {}".format(params))
-    # print("Data: {}".format(request.data))
-    # print("Files: {}".format(request.files))
-    # print("Headers: {}".format(request.headers))
-    # print("Form: {}".format(request.form))
-    # print("Cookies: {}".format(request.cookies))
-    # print("Stream: {}".format(request.stream.getvalue()))
-    # print("JSON: {}".format(json))
-
     if 'application/json' not in request.headers.get('Content-Type'):
         msg = 'Transport header `Content-Type` must be `application/json`.'
         error = {'error': msg}
