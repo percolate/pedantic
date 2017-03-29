@@ -363,6 +363,26 @@ def validate_request_against_schema(data, spec):
         raise JSONSchemaValidationError(err_msg)
 
 
+def _remove_required(spec, parent_prop=None, keep=False):
+    """ 
+    Don't enforce required fields on the response. Required fields directly 
+    inside `oneOf` must be present.     
+    """
+    if type(spec) is list:
+        should_keep = False
+        if parent_prop == 'oneOf':
+            should_keep = len(
+                list(filter(lambda x: x['type'] == 'object', spec))) > 1
+        for prop in spec:
+            _remove_required(prop, parent_prop, should_keep)
+    elif type(spec) is dict:
+        for prop in spec.keys():
+            if prop == 'required' and type(spec[prop]) is list and not keep:
+                del spec[prop]
+            else:
+                _remove_required(spec[prop], prop)
+
+
 def validate_response_against_schema(data, spec):
     """
     Validates the instance data from the response.
@@ -385,6 +405,7 @@ def validate_response_against_schema(data, spec):
                 raw_instance_schema = (
                     json_response['schema'])
                 instance_schema = json.loads(raw_instance_schema)
+                _remove_required(instance_schema)
                 res_data = data.response.response_data
                 try:
                     _validate(res_data, instance_schema)
