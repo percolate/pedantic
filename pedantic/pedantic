@@ -16,10 +16,7 @@ Options:
 
 """
 
-try:
-    from docopt import docopt
-except ImportError:
-    pass
+from docopt import docopt
 
 import validator_service as val
 
@@ -46,7 +43,6 @@ def runserver():
 
 
 if __name__ == '__main__':
-    if docopt:
-        arguments = docopt(__doc__, version='Pedantic 0.1')
-        print(arguments)
+    arguments = docopt(__doc__, version='Pedantic 0.1')
+    print(arguments)
     runserver()
