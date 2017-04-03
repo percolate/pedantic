@@ -13,6 +13,7 @@ from pedantic.check_against_schema import (
     is_whitelisted,
     _find_resource,
     _get_path_segments,
+    _remove_required,
     validate_request_against_schema,
     validate_response_against_schema,
     parse_data,
@@ -475,12 +476,6 @@ class ParserTestCase(unittest.TestCase):
             parse_data(self.request_w_query_string)
 
     def test_parse_request_raises_when_missing_both_one_of_fields(self):
-        # Asserts on Falsy
-        self.request_w_query_string['request'] = None
-        self.request_w_query_string['response'] = None
-        with self.assertRaises(ValueError):
-            parse_data(self.request_w_query_string)
-        # Asserts when missing
         del self.request_w_query_string['request']
         del self.request_w_query_string['response']
         with self.assertRaises(ValueError):
@@ -560,3 +555,85 @@ class WhiteListTestCase(unittest.TestCase):
         whitelist = [{'path': '/some/path/long'}]
         setattr(self.request, 'path', '/some/path/longer')
         self.assertTrue(is_whitelisted(self.request, whitelist))
+
+
+class RemoveRequiredTestCase(unittest.TestCase):
+
+    def test__remove_required(self):
+        data = {
+                'required': ['foo'],
+                'properties': {
+                    'foo': {
+                        'oneOf': [
+                            {
+                                'required': ['foo'],
+                                'type': 'object',
+                                'properties': {
+                                    'foo': {'type': 'string'},
+                                },
+                            },
+                            {'type': 'null'},
+                        ],
+                    },
+                    'bar': {
+                        'oneOf': [
+                            {
+                                'required': ['foo'],
+                                'type': 'object',
+                                'additionalProperties': False,
+                                'properties': {
+                                    'foo': {'type': 'string'},
+                                },
+                            },
+                            {
+                                'required': ['bar'],
+                                'type': 'object',
+                                'additionalProperties': False,
+                                'properties': {
+                                    'bar': {'type': 'string'},
+                                },
+                            },
+                        ],
+                    },
+                },
+            }
+
+        _remove_required(data)
+
+        expected_data = {
+                'properties': {
+                    'foo': {
+                        'oneOf': [
+                            {
+                                'type': 'object',
+                                'properties': {
+                                    'foo': {'type': 'string'},
+                                },
+                            },
+                            {'type': 'null'},
+                        ],
+                    },
+                    'bar': {
+                        'oneOf': [
+                            {
+                                'required': ['foo'],
+                                'type': 'object',
+                                'additionalProperties': False,
+                                'properties': {
+                                    'foo': {'type': 'string'},
+                                },
+                            },
+                            {
+                                'required': ['bar'],
+                                'type': 'object',
+                                'additionalProperties': False,
+                                'properties': {
+                                    'bar': {'type': 'string'},
+                                },
+                            },
+                        ],
+                    },
+                },
+            }
+
+        self.assertDictEqual(data, expected_data)

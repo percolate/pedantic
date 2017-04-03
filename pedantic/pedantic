@@ -12,7 +12,7 @@ Options:
     -h, --help                      Show this screen and exit.
     --version                       Show version.
     --whitelist=<whitelist_path>    Path to file containing JSON whitelist contents.
-    --port=<port_number>            Set the port number of the proxy, default `5000`.
+    --port=<port_number>            Set the port number of the service, default `5000`.
 
 """
 
