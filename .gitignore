@@ -1,10 +1,22 @@
 .DS_Store
 **/.idea/*
 *.pyc
+*.out
+node_modules/
+
+# Sphinx side effects
 docs/_build/
 docs/_static/
 docs/_templates/
+
+# Percolate downloaded inputs
 index.raml
 schema.json
 whitelist.json
-node_modules/
+
+# Client 'make' side effects
+.Python
+pip-selfcheck.json
+bin/
+include/
+lib/
