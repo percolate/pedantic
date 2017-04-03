@@ -1,12 +1,17 @@
 from __future__ import unicode_literals
+
 import json
 import re
 from collections import namedtuple
+try:
+    from urlparse import parse_qs
+except ImportError:
+    from urllib.parse.urlparse import parse_qs
 
 from jsonschema.exceptions import ValidationError
 from jsonschema.validators import Draft4Validator
-from urlparse import parse_qs
 from dateutil.parser import parse as validate_date
+
 
 import logging
 log = logging.getLogger(__name__)
