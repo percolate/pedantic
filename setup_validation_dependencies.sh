@@ -1,9 +1,12 @@
 #!/usr/bin/env bash
 
+set -ex
+
 if [ ! -f "bin/activate" ]; then
   virtualenv .
 fi
-source bin/activate
+
+. ./bin/activate
 pip install -r requirements.txt
 
 cd pedantic
