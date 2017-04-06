@@ -6,7 +6,7 @@ from collections import namedtuple
 try:
     from urlparse import parse_qs
 except ImportError:
-    from urllib.parse.urlparse import parse_qs
+    from urllib.parse import parse_qs
 
 from jsonschema.exceptions import ValidationError
 from jsonschema.validators import Draft4Validator
