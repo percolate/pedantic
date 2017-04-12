@@ -82,7 +82,7 @@ def validator():
                       'validation.'.format(data.path)
                 value = {'warning': msg}
                 return jsonify(value), 200
-        msg = {'error:': e.message}
+        msg = {'error': e.message}
         return jsonify(msg), 400
 
     # Validate the request and/or response
