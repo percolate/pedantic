@@ -7,6 +7,4 @@ jobs:
       - image: themattrix/tox
     steps:
       - checkout
-      - run: pwd
-      - run: ls -al
       - run: tox
