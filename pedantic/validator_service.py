@@ -1,5 +1,6 @@
-"""Pendantic service providing REST API for fixture validation."""
+"""Pedantic service providing REST API for fixture validation."""
 
+from __future__ import absolute_import, unicode_literals
 import json
 
 from flask import Flask, request, jsonify
