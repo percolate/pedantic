@@ -2,10 +2,11 @@ version: 2
 
 jobs:
   build:
-    working_directory: ~/
+    working_directory: ~/pedantic
     docker:
       - image: themattrix/tox
     steps:
+      - checkout
       - run: pwd
       - run: ls -al
       - run: tox
