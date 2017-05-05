@@ -2,8 +2,10 @@ version: 2
 
 jobs:
   build:
-    working_directory: ~
+    working_directory: ~/
     docker:
       - image: themattrix/tox
     steps:
+      - pwd
+      - ls -al
       - run: tox
