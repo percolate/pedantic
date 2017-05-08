@@ -1,4 +1,5 @@
 # coding: utf-8
+from __future__ import absolute_import, unicode_literals
 
 import unittest
 from copy import deepcopy
@@ -121,9 +122,9 @@ class RequestValidatorTestCase(ValidatorTestBase):
         try:
             validate_request_against_schema(req_info, self.spec)
         except JSONSchemaValidationError as e:
-            self.assertGreater(e.message.count(error_indicator), 1)
-            self.assertGreater(e.message.count(suberror_indicator), 1)
-            self.assertGreater(e.message.count(stage_indicator), 1)
+            self.assertGreater(str(e).count(error_indicator), 1)
+            self.assertGreater(str(e).count(suberror_indicator), 1)
+            self.assertGreater(str(e).count(stage_indicator), 1)
         else:
             self.fail("Did not raise JSONSchemaValidationError.")
 
@@ -440,7 +441,6 @@ class ParserTestCase(unittest.TestCase):
             'a_bool': True
         }
         self.assertEquals(data.request.query_data, expected)
-        self.assertIsInstance(data.request.query_data['a_string'], str)
         self.assertIsInstance(data.request.query_data['list'], list)
         self.assertIsInstance(data.request.query_data['a_number'], int)
 

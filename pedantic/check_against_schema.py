@@ -1,4 +1,4 @@
-from __future__ import unicode_literals
+from __future__ import absolute_import, unicode_literals
 
 import json
 import re
@@ -66,12 +66,13 @@ def parse_data(json_data):
 
     query_data = json_data['query_string']
     if query_data:
+        # parse_qs returns each value from query string enclosed in a list,
+        #   even single elements.
         query_data = parse_qs(
             query_data,
             keep_blank_values=True
         )
         for key in query_data:
-            # everything from query string is in a list, even if single element
             if len(query_data[key]) == 1:
                 # remove the enclosing list from non-list types
                 query_data[key] = _parse_from_string(query_data[key][0])
@@ -216,8 +217,8 @@ def _parse_from_string(a_string):
     except Exception:
         field = a_string
 
-    # if the field has a comma, may be a list
-    if isinstance(field, basestring) and ',' in field:
+    # if the field has a comma, may be a list (py2/3 compatible condition)
+    if type(field).__name__ in ['str', 'unicode'] and ',' in field:
         field = [_parse_from_string(item) for item in field.split(",")]
     return field
 
@@ -234,14 +235,14 @@ def _do_param_validation(param, schema):
             )
         return err_msg
     # sometimes a number should be a string
-    elif isinstance(param, (int, long, float)) and schema['type'] == 'string':
-        param = unicode(param)
+    elif isinstance(param, (int, float)) and schema['type'] == 'string':
+        param = str(param)
 
     if schema['type'] == 'date':
         try:
             validate_date(param)
         except ValueError as e:
-            if "Unknown string format" in e.message:
+            if "Unknown string format" in str(e):
                 err_msg = (" - Request query param '{}' does not conform"
                            " to any known date format.\n".format(param))
             else:
@@ -251,7 +252,7 @@ def _do_param_validation(param, schema):
     try:
         _validate(param, schema)
     except Exception as e:
-        err_msg = e.message
+        err_msg = str(e)
     return err_msg
 
 
@@ -278,7 +279,7 @@ def _validate(data, schema):
         for suberror in suberrors:
             err_msg = ("".join([
                 err_msg, "     > Schema path: ",
-                unicode(list(suberror.schema_path)),
+                str(list(suberror.schema_path)),
                 " Error: ", suberror.message, "\n"
             ]))
     if errors:
@@ -329,7 +330,7 @@ def validate_request_against_schema(data, spec):
             try:
                 qp_schema = spec['queryParameters'][param]
             except KeyError as e:
-                err_msg = "".join([err_msg, " - Query parameter '", e.message,
+                err_msg = "".join([err_msg, " - Query parameter '", str(e),
                                    "' undefined in specification.\n"])
             else:
                 err_msg = "".join([
@@ -358,13 +359,13 @@ def validate_request_against_schema(data, spec):
         except Exception as e:
             err_msg = "".join([
                 err_msg, "\nRequest data validation errors...\n\n",
-                e.message])
+                str(e)])
 
     # Finally raise all validation errors at once
     if err_msg:
         err_msg = "".join([
             err_msg, "\nRequest detail:\n\n'",
-            unicode(json.loads(json.dumps(data))), "\n"])
+            str(json.loads(json.dumps(data))), "\n"])
         raise JSONSchemaValidationError(err_msg)
 
 
@@ -377,11 +378,11 @@ def _remove_required(spec, parent_prop=None, keep=False):
         should_keep = False
         if parent_prop == 'oneOf':
             should_keep = len(
-                list(filter(lambda x: x['type'] == 'object', spec))) > 1
+                list([x for x in spec if x['type'] == 'object'])) > 1
         for prop in spec:
             _remove_required(prop, parent_prop, should_keep)
     elif type(spec) is dict:
-        for prop in spec.keys():
+        for prop in list(spec.keys()):
             if prop == 'required' and type(spec[prop]) is list and not keep:
                 del spec[prop]
             else:
@@ -399,9 +400,9 @@ def validate_response_against_schema(data, spec):
     :raises: :class:`.UndefinedSchemaError`
 
     """
-    res_status_code = unicode(data.response.status_code)
+    res_status_code = str(data.response.status_code)
     # Now match the response status code with the schema for the code
-    for code, value in spec['responses'].iteritems():
+    for code, value in spec['responses'].items():
         if code == res_status_code:
             if 'body' in value:
                 json_response = value['body']['application/json']
@@ -417,12 +418,12 @@ def validate_response_against_schema(data, spec):
                 except Exception as e:
                     msg = "".join([
                         "Found during response validation:\n",
-                        e.message,
-                        "\nRequest:\n\n'", unicode(data.request),
+                        str(e),
+                        "\nRequest:\n\n'", str(data.request),
                         "\n\nResponse:\n\n",
-                        "STATUS CODE: ", unicode(data.response.status_code),
+                        "STATUS CODE: ", str(data.response.status_code),
                         "\nCONTENT: ",
-                        unicode(json.loads(json.dumps(data.response.response_data))),
+                        str(json.loads(json.dumps(data.response.response_data))),
                         "\n"])
                     raise JSONSchemaValidationError(msg)
                 return
@@ -432,7 +433,7 @@ def validate_response_against_schema(data, spec):
         "The status code '{}' for method '{}' and path '{}' is not defined by"
         " the specification.".format(
             res_status_code,
-            unicode(data.method),
-            unicode(data.path)
+            str(data.method),
+            str(data.path)
         )
     )
