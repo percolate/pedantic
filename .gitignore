@@ -3,6 +3,10 @@
 *.pyc
 *.out
 node_modules/
+.tox
+.cache
+.coverage
+.python-version
 
 # Sphinx side effects
 docs/_build/
@@ -14,9 +18,3 @@ index.raml
 schema.json
 whitelist.json
 
-# Client 'make' side effects
-.Python
-pip-selfcheck.json
-bin/
-include/
-lib/
