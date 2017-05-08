@@ -1,0 +1,5 @@
+.*
+tox.ini
+runtests.sh
+tests*
+docs*
