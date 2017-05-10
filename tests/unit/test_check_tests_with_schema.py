@@ -401,7 +401,7 @@ class GetPathSegmentsTestCase(unittest.TestCase):
             'path_info': '/api/v5/test/test:97'
         }
         result_segments = _get_path_segments(req_path_info)
-        self.assertEquals(result_segments, expected)
+        self.assertEqual(result_segments, expected)
 
     def test__get_path_segments_with_three_segments(self):
         """
@@ -413,7 +413,7 @@ class GetPathSegmentsTestCase(unittest.TestCase):
             'path_info': '/api/v5/auth'
         }
         result_segments = _get_path_segments(req_path_info)
-        self.assertEquals(result_segments, expected)
+        self.assertEqual(result_segments, expected)
 
 
 class ParserTestCase(unittest.TestCase):
@@ -440,7 +440,7 @@ class ParserTestCase(unittest.TestCase):
             'a_string': 'the string',
             'a_bool': True
         }
-        self.assertEquals(data.request.query_data, expected)
+        self.assertEqual(data.request.query_data, expected)
         self.assertIsInstance(data.request.query_data['list'], list)
         self.assertIsInstance(data.request.query_data['a_number'], int)
 
@@ -452,7 +452,7 @@ class ParserTestCase(unittest.TestCase):
         self.request_w_query_string['query_string'] = qs
         data = parse_data(self.request_w_query_string)
         expected = {'list_item': [1, 2, 3]}
-        self.assertEquals(data.request.query_data, expected)
+        self.assertEqual(data.request.query_data, expected)
         self.assertIsInstance(data.request.query_data['list_item'], list)
 
     def test_parse_request_raises_when_missing_required_path_field(self):

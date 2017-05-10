@@ -5,7 +5,7 @@ import json
 
 from flask import Flask, request, jsonify
 
-from check_against_schema import (
+from .check_against_schema import (
     validate_request_against_schema,
     validate_response_against_schema,
     is_whitelisted,
