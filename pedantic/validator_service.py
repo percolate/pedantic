@@ -70,7 +70,7 @@ def validator():
     try:
         data = parse_data(json)
     except ValueError as e:
-        msg = {'error': e.message, 'data': json}
+        msg = {'error': str(e), 'data': json}
         return jsonify(msg), 400
 
     # Get the specific schema under test
@@ -83,7 +83,7 @@ def validator():
                       'validation.'.format(data.path)
                 value = {'warning': msg}
                 return jsonify(value), 200
-        msg = {'error': e.message}
+        msg = {'error': str(e)}
         return jsonify(msg), 400
 
     # Validate the request and/or response
@@ -92,13 +92,13 @@ def validator():
         try:
             validate_request_against_schema(data, spec)
         except JSONSchemaValidationError as e:
-            errors = '{}\n\n'.format(e.message)
+            errors = '{}\n\n'.format(str(e))
 
     if data.response:
         try:
             validate_response_against_schema(data, spec)
         except JSONSchemaValidationError as e:
-            errors += e.message
+            errors += str(e)
 
     # Return the results
     if not errors:
