@@ -18,7 +18,7 @@ Options:
 
 from docopt import docopt
 
-import validator_service as val
+import pedantic.validator_service as val
 
 
 def runserver():

@@ -5,7 +5,7 @@ import json
 
 from flask import Flask, request, jsonify
 
-from check_against_schema import (
+from .check_against_schema import (
     validate_request_against_schema,
     validate_response_against_schema,
     is_whitelisted,
@@ -46,7 +46,7 @@ def validator():
             "POST", "path_info": "/api/v5/test/", "request":
             {"x": "data"}}' -H "Content-Type: application/json"
 
-        **Example response**:
+        **Success response**:
 
         .. sourcecode:: http
 
@@ -57,6 +57,20 @@ def validator():
             {
               "message": "All is well with the world (and your fixture)."
             }
+
+        **Failure response**:
+
+        .. sourcecode:: http
+
+            HTTP/1.0 400 BAD REQUEST
+            Content-Type: application/json
+            Content-Length: 78
+
+            {
+              "error": "The requested resource '/dummy/path/' was not found in spec."
+            }
+
+            
 
         :return: On success 200 is returned, otherwise 400 with error detail.
 
