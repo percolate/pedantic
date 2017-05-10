@@ -18,7 +18,7 @@ Module API
 .. automodule:: pedantic.check_against_schema
   :members: parse_data
 
-Miscellaneous
+Test
 -------------
 
 * To run tests, from top repo directory: `python -m unittest discover --start-directory ./tests/unit/`
