@@ -24,7 +24,7 @@ from pedantic.check_against_schema import (
 )
 
 
-schema_file = 'test_schemas_fixture.json'
+schema_file = 'example_schema.json'
 with open(os.path.join(sys.path[0], schema_file), 'r') as f:
     read_data = f.read()
 SCHEMAS = json.loads(read_data)
