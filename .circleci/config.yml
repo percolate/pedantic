@@ -7,6 +7,6 @@ jobs:
       - image: themattrix/tox
     steps:
       - checkout
-      - pip install codecov
+      - run: pip install codecov
       - run: tox
-      - codecov
+      - run: codecov
