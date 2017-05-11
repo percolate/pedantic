@@ -1,3 +1,3 @@
 #!/usr/bin/env bash
 
-python -m unittest discover --start-directory ./tests/unit/
+python -m unittest discover --start-directory ./tests/
