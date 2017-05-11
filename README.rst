@@ -1,3 +1,13 @@
+.. image:: https://codecov.io/github/j-funk/pedantic/coverage.svg?branch=master
+   :target: https://codecov.io/github/j-funk/pedantic?branch=master
+   :alt: Build Status
+   :align: right
+
+.. image:: https://circleci.com/gh/j-funk/pedantic.svg?style=shield&circle-token=02115294d1f76a7343f3df1cfd3d9c279a40969f
+   :target: https://circleci.com/gh/j-funk/pedantic
+   :alt: Code Coverage
+   :align: right
+
 ########
 Pedantic
 ########
