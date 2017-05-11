@@ -96,6 +96,9 @@ def parse_data(json_data):
     elif json_data['response']:
         msg = 'A `response` must be accompanied by a value in `status_code`.'
         raise ValueError(msg)
+    elif json_data['status_code']:
+        msg = 'A `response` must not be empty.'
+        raise ValueError(msg)
 
     if not json_data['path_info'].startswith("/"):
         msg = 'Path info must begin with `/`.'
@@ -358,7 +361,7 @@ def validate_request_against_schema(data, spec):
             _validate(req_data, instance_schema)
         except Exception as e:
             err_msg = "".join([
-                err_msg, "\nRequest data validation errors...\n\n",
+                err_msg, "\nFound during request validation...\n\n",
                 str(e)])
 
     # Finally raise all validation errors at once
