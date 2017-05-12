@@ -62,7 +62,7 @@ Test
 
 To execute Pedantic suite of unit tests after installation, from top directory run:
 
-    ``python -m unittest discover --start-directory ./tests/unit/``
+    ``python -m unittest discover --start-directory ./tests/``
 
 
 License

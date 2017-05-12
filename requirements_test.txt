@@ -1,0 +1,5 @@
+Flask==0.12
+docopt==0.6.2
+jsonschema==2.5.1
+python-dateutil==2.4.2
+requests==2.14.1
