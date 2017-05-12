@@ -18,44 +18,8 @@ Pedantic is also available as a Docker image `here <https://hub.docker.com/r/jul
 API
 ---
 
-.. autoflask:: pedantic.validator_service:app
-  :undoc-static:
+.. autosimple:: pedantic.validator_service.validator
 
-.. code-block:: json
-
-    {
-        "title": "Pedantic POST API",
-        "type": "object",
-        "properties": {
-            "path_info": {
-                "description": "Path to the mocked resource.",
-                "example": "/some/endpoint/",
-                "type": "string"
-            },
-            "method": {
-                "description": "Method of mocked request.",
-                "example": "GET",
-                "type": "string"
-            },
-            "request": "Documentation in progress",
-            "response": "Documentation in progress",
-            "query_string": {
-                "description": "Mock request query string.",
-                "example": "GET",
-                "type": "string"
-            },
-            "status_code": "Documentation in progress"
-        },
-        "required": ["path_info", "method"],
-        "oneOf" : [
-            {
-                "required" : ["request"]
-            },
-            {
-                "required" : ["response"]
-            }
-        ]
-    }
 
 Test
 ----

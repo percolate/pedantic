@@ -37,7 +37,7 @@ def validator():
 
         Receives relevant fixture information as POST JSON data payload. The
         data is validated and the validation result is returned.
-
+        
         **Example request**:
 
         .. code-block:: bash
@@ -73,7 +73,44 @@ def validator():
             
 
         :return: On success 200 is returned, otherwise 400 with error detail.
-
+    
+        **JSON Schema Definition:**
+        
+        .. code-block:: json
+        
+            {
+                "title": "Pedantic POST API",
+                "type": "object",
+                "properties": {
+                    "path_info": {
+                        "description": "Path to the mocked resource.",
+                        "example": "/some/endpoint/",
+                        "type": "string"
+                    },
+                    "method": {
+                        "description": "Method of mocked request.",
+                        "example": "GET",
+                        "type": "string"
+                    },
+                    "request": "Documentation in progress",
+                    "response": "Documentation in progress",
+                    "query_string": {
+                        "description": "Mock request query string.",
+                        "example": "GET",
+                        "type": "string"
+                    },
+                    "status_code": "Documentation in progress"
+                },
+                "required": ["path_info", "method"],
+                "oneOf" : [
+                    {
+                        "required" : ["request"]
+                    },
+                    {
+                        "required" : ["response"]
+                    }
+                ]
+            }
     """
     if 'application/json' not in request.headers.get('Content-Type'):
         msg = 'Transport header `Content-Type` must be `application/json`.'

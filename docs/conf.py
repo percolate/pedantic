@@ -161,3 +161,22 @@ texinfo_documents = [
      author, 'Pedantic', 'One line description of project.',
      'Miscellaneous'),
 ]
+
+#################################################
+# custom autodoc removes signature from functions
+from sphinx.ext import autodoc
+
+
+class SimpleDocumenter(autodoc.FunctionDocumenter):
+    objtype = 'simple'
+
+    # do not indent the content
+    content_indent = ''
+
+    # do not add a header to the docstring
+    def add_directive_header(self, sig):
+        pass
+
+
+def setup(app):
+    app.add_autodocumenter(SimpleDocumenter)
