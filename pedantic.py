@@ -3,10 +3,10 @@
 Configure and start the Pedantic service.
 
 Usage:
-    pedantic SCHEMA_PATH [--whitelist=<whitelist_path>] [--port=<port_number>]
+    pedantic.py SCHEMA_PATH [--whitelist=<whitelist_path>] [--port=<port_number>]
 
 Example:
-    pedantic /path/to/schema/file.json --whitelist=/path/whitelist.json
+    pedantic.py /path/to/schema/file.json --whitelist=/path/whitelist.json
 
 Options:
     -h, --help                      Show this screen and exit.
