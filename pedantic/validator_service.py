@@ -83,32 +83,40 @@ def validator():
                 "type": "object",
                 "properties": {
                     "path_info": {
-                        "description": "Path to the mocked resource.",
-                        "example": "/some/endpoint/",
-                        "type": "string"
+                        "description": "Path to the mock resource.",
+                        "type": "string",
+                        "example": "/some/endpoint/"
                     },
                     "method": {
-                        "description": "Method of mocked request.",
+                        "description": "Method of mock request.",
+                        "type": "string",
                         "example": "GET",
-                        "type": "string"
                     },
-                    "request": "Documentation in progress",
-                    "response": "Documentation in progress",
+                    "request": {
+                        "description": "Payload of mock request.",
+                        "type": "object",
+                        "example": { "some_prop": "some_value" }
+                    },
+                    "response": {
+                        "description": "Payload of mock response.",
+                        "type": "object",
+                        "example": { "data": { "some_prop": "some_value" } }
+                    },
                     "query_string": {
                         "description": "Mock request query string.",
-                        "example": "GET",
+                        "example": "param1=a_string,param2=123",
                         "type": "string"
                     },
-                    "status_code": "Documentation in progress"
-                },
-                "required": ["path_info", "method"],
-                "oneOf" : [
-                    {
-                        "required" : ["request"]
-                    },
-                    {
-                        "required" : ["response"]
+                    "status_code": {
+                        "description": "Status of mock response.",
+                        "example": 200,
+                        "type": "number"
                     }
+                },
+                "required": [ "path_info", "method" ],
+                "oneOf" : [
+                    { "required" : [ "request" ] },
+                    { "required" : [ "response", "status_code" ] }
                 ]
             }
     """
