@@ -4,6 +4,7 @@ from __future__ import absolute_import, unicode_literals
 import json
 
 from flask import Flask, request, jsonify
+from jsonschema.exceptions import ValidationError
 
 from .check_against_schema import (
     validate_request_against_schema,
@@ -120,6 +121,7 @@ def validator():
                 ]
             }
     """
+
     if 'application/json' not in request.headers.get('Content-Type'):
         msg = 'Transport header `Content-Type` must be `application/json`.'
         error = {'error': msg}
@@ -128,8 +130,9 @@ def validator():
     json = request.get_json()
     try:
         data = parse_data(json)
-    except ValueError as e:
-        msg = {'error': str(e), 'data': json}
+    except ValidationError as e:
+        err_msg = "Pedantic error{}".format(str(e))
+        msg = {'error': err_msg, 'data': json}
         return jsonify(msg), 400
 
     # Get the specific schema under test

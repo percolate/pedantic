@@ -97,12 +97,42 @@ class TestPedantic(unittest.TestCase):
                 "method": "POST",
                 "path_info": "/api/v5/test/",
                 "status_code": 200,
-                "response": {'data': 'is not an object as specified'}
+                "response": {'data': 'a string'}
             }),
             content_type='application/json'
         )
         data = json.loads(resp.data.decode('utf8'))['error']
         self.assertIn('response validation', data)
+        self.assertEqual(resp.status_code, 400)
+
+    def test_validator_missing_required_query_param(self):
+        resp = self.app.post(
+            '/',
+            data=json.dumps({
+                "method": "POST",
+                "path_info": "/api/v5/test/",
+                "query_string": "optional_param=1",
+                "request": {"x": "data"},
+            }),
+            content_type='application/json'
+        )
+        data = json.loads(resp.data.decode('utf8'))['error']
+        self.assertIn('query param validation', data)
+        self.assertEqual(resp.status_code, 400)
+
+    def test_validator_non_conforming_pedantic_request(self):
+        resp = self.app.post(
+            '/',
+            data=json.dumps({
+                "method": "POST",
+                "path_info": "/api/v5/test/",
+                "query_typo": "no matter",  # this key is the trigger
+                "request": {"x": "data"},
+            }),
+            content_type='application/json'
+        )
+        data = json.loads(resp.data.decode('utf8'))['error']
+        self.assertIn('Additional properties', data)
         self.assertEqual(resp.status_code, 400)
 
     def test_validator_happy_validation_time(self):
@@ -111,8 +141,11 @@ class TestPedantic(unittest.TestCase):
             data=json.dumps({
                 "method": "POST",
                 "path_info": "/api/v5/test/",
-                "request": {}
-            }),
+                "query_string": "required_param=a_string,optional_param=1",
+                "status_code": 200,
+                "request": {"x": "data"},
+                "response": {"data": {"any": "thing"}}
+        }),
             content_type='application/json'
         )
         data = json.loads(resp.data.decode('utf8'))['message']

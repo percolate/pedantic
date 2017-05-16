@@ -20,6 +20,50 @@ Data = namedtuple('Data', 'path method request response')
 Request = namedtuple('Request', 'request_data query_data')
 Response = namedtuple('Response', 'response_data status_code')
 
+LOCAL_SCHEMA = {
+    "title": "Pedantic POST API",
+    "type": "object",
+    "additionalProperties": False,
+    "properties": {
+        "path_info": {
+            "description": "Path to the mock resource.",
+            "type": "string",
+            "pattern": "^/*",
+            "example": "/some/endpoint/"
+        },
+        "method": {
+            "description": "Method of mock request.",
+            "type": "string",
+            "example": "GET",
+        },
+        "request": {
+            "description": "Payload of mock request.",
+            "type": "object",
+            "example": {"some_prop": "some_value"}
+        },
+        "response": {
+            "description": "Payload of mock response.",
+            "type": "object",
+            "example": {"data": {"some_prop": "some_value"}}
+        },
+        "query_string": {
+            "description": "Mock request query string.",
+            "example": "param1=a_string,param2=123",
+            "type": "string"
+        },
+        "status_code": {
+            "description": "Status of mock response.",
+            "example": 200,
+            "type": "number"
+        }
+    },
+    "required": ["path_info", "method"],
+    "anyOf": [
+        {"required": ["request"]},
+        {"required": ["response", "status_code"]}
+    ]
+}
+
 
 class JSONSchemaValidationError(Exception):
     """Raised for errors specific to schema validation"""
@@ -46,23 +90,12 @@ def parse_data(json_data):
             query_data (dict): query string items
 
     """
+    # Ensure all conditions of Pedantic API are met
+    _validate(json_data, LOCAL_SCHEMA)
 
-    # Ensure we have everything we need to before parsing
-    required = ['path_info', 'method']
-    if not all(json_data.get(item) for item in required):
-        msg = 'The following fields are required: {}'.format(required)
-        raise ValueError(msg)
-
-    one_of = ['request', 'response']
-    if not any(item in json_data for item in one_of):
-        msg = 'One or more of the following fields are required: {}'\
-            .format(one_of)
-        raise ValueError(msg)
-
-    optional = ['query_string', 'request', 'response', 'status_code']
-    for item in optional:
-        if item not in json_data:
-            json_data[item] = None
+    for (key, value) in LOCAL_SCHEMA['properties'].items():
+        if key not in json_data:
+            json_data[key] = None
 
     query_data = json_data['query_string']
     if query_data:
@@ -93,16 +126,6 @@ def parse_data(json_data):
             response_data=json_data['response'],
             status_code=json_data['status_code']
         )
-    elif json_data['response']:
-        msg = 'A `response` must be accompanied by a value in `status_code`.'
-        raise ValueError(msg)
-    elif json_data['status_code']:
-        msg = 'A `response` must not be empty.'
-        raise ValueError(msg)
-
-    if not json_data['path_info'].startswith("/"):
-        msg = 'Path info must begin with `/`.'
-        raise ValueError(msg)
 
     return Data(
             path=json_data['path_info'],

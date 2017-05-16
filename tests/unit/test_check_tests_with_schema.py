@@ -6,6 +6,7 @@ from copy import deepcopy
 import json
 import os
 import sys
+from jsonschema.exceptions import ValidationError
 
 from pedantic.check_against_schema import (
     Data,
@@ -458,37 +459,38 @@ class ParserTestCase(unittest.TestCase):
     def test_parse_request_raises_when_missing_required_path_field(self):
         # Asserts on Falsy
         self.request_w_query_string['path_info'] = None
-        with self.assertRaises(ValueError):
+        with self.assertRaises(ValidationError):
             parse_data(self.request_w_query_string)
         # Asserts when missing
         del self.request_w_query_string['path_info']
-        with self.assertRaises(ValueError):
+        with self.assertRaises(ValidationError):
             parse_data(self.request_w_query_string)
 
     def test_parse_request_raises_when_missing_required_method_field(self):
         # Asserts on Falsy
         self.request_w_query_string['method'] = None
-        with self.assertRaises(ValueError):
+        with self.assertRaises(ValidationError):
             parse_data(self.request_w_query_string)
         # Asserts when missing
         del self.request_w_query_string['method']
-        with self.assertRaises(ValueError):
+        with self.assertRaises(ValidationError):
             parse_data(self.request_w_query_string)
 
-    def test_parse_request_raises_when_missing_both_one_of_fields(self):
+    def test_parse_request_raises_when_missing_both_any_of_fields(self):
         del self.request_w_query_string['request']
         del self.request_w_query_string['response']
-        with self.assertRaises(ValueError):
+        with self.assertRaises(ValidationError):
             parse_data(self.request_w_query_string)
 
     def test_parse_request_raises_when_response_missing_status_field(self):
+        del self.request_w_query_string['request']
         # Asserts on Falsy
         self.request_w_query_string['status_code'] = None
-        with self.assertRaises(ValueError):
+        with self.assertRaises(ValidationError):
             parse_data(self.request_w_query_string)
         # Asserts when missing
         del self.request_w_query_string['status_code']
-        with self.assertRaises(ValueError):
+        with self.assertRaises(ValidationError):
             parse_data(self.request_w_query_string)
 
 
