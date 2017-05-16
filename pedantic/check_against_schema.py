@@ -2,6 +2,7 @@ from __future__ import absolute_import, unicode_literals
 
 import json
 import re
+import os
 from collections import namedtuple
 try:
     from urlparse import parse_qs
@@ -20,49 +21,9 @@ Data = namedtuple('Data', 'path method request response')
 Request = namedtuple('Request', 'request_data query_data')
 Response = namedtuple('Response', 'response_data status_code')
 
-LOCAL_SCHEMA = {
-    "title": "Pedantic POST API",
-    "type": "object",
-    "additionalProperties": False,
-    "properties": {
-        "path_info": {
-            "description": "Path to the mock resource.",
-            "type": "string",
-            "pattern": "^/*",
-            "example": "/some/endpoint/"
-        },
-        "method": {
-            "description": "Method of mock request.",
-            "type": "string",
-            "example": "GET",
-        },
-        "request": {
-            "description": "Payload of mock request.",
-            "type": "object",
-            "example": {"some_prop": "some_value"}
-        },
-        "response": {
-            "description": "Payload of mock response.",
-            "type": "object",
-            "example": {"data": {"some_prop": "some_value"}}
-        },
-        "query_string": {
-            "description": "Mock request query string.",
-            "example": "param1=a_string,param2=123",
-            "type": "string"
-        },
-        "status_code": {
-            "description": "Status of mock response.",
-            "example": 200,
-            "type": "number"
-        }
-    },
-    "required": ["path_info", "method"],
-    "anyOf": [
-        {"required": ["request"]},
-        {"required": ["response", "status_code"]}
-    ]
-}
+dir_path = os.path.dirname(os.path.realpath(__file__))
+with open(os.path.join(dir_path, 'pedantic_api.json')) as f:
+    LOCAL_SCHEMA = json.load(f)
 
 
 class JSONSchemaValidationError(Exception):

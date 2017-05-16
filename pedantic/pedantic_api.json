@@ -1,0 +1,43 @@
+{
+    "title": "Pedantic POST API",
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+        "path_info": {
+            "description": "Path to the mock resource.",
+            "type": "string",
+            "pattern": "^/*",
+            "example": "/some/endpoint/"
+        },
+        "method": {
+            "description": "Method of mock request.",
+            "type": "string",
+            "example": "GET"
+        },
+        "request": {
+            "description": "Payload of mock request.",
+            "type": "object",
+            "example": {"some_prop": "some_value"}
+        },
+        "response": {
+            "description": "Payload of mock response.",
+            "type": "object",
+            "example": {"data": {"some_prop": "some_value"}}
+        },
+        "query_string": {
+            "description": "Mock request query string.",
+            "example": "param1=a_string,param2=123",
+            "type": "string"
+        },
+        "status_code": {
+            "description": "Status of mock response.",
+            "example": 200,
+            "type": "number"
+        }
+    },
+    "required": ["path_info", "method"],
+    "anyOf": [
+        {"required": ["request"]},
+        {"required": ["response", "status_code"]}
+    ]
+}
