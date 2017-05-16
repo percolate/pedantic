@@ -36,4 +36,4 @@ longer function correctly.
 
 Pedantic is a lightweight service designed to run on the same host as the test client and is accessible via
 `localhost`.  Provide Pedantic with the API definition in RAML, then during testing send the fixture data
-to Pedantic.  Pedantic validates the fixture and sends it's results back to the caller.
+to Pedantic.  Pedantic validates the fixture and sends its results back to the caller.
