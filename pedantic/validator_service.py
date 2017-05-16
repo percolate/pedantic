@@ -39,13 +39,39 @@ def validator():
         Receives relevant fixture information as POST JSON data payload. The
         data is validated and the validation result is returned.
         
-        **Example request**:
+        **Example - validate request & response at once**:
 
         .. code-block:: bash
 
-            curl -X POST -i http://localhost:5000/ --data '{"method":
-            "POST", "path_info": "/api/v5/test/", "request":
-            {"x": "data"}}' -H "Content-Type: application/json"
+            curl -X POST -i http://localhost:5000/ --data '{
+                "method": "POST",
+                "path_info": "/api/v5/test/", 
+                "query_string": "required_param=a_string,optional_param=1", 
+                "status_code": 200,
+                "request": {"x": "data"},
+                "response": {"data": {"some": "thing"}}
+            }' -H "Content-Type: application/json"
+
+        **Example - validate request only**:
+
+        .. code-block:: bash
+
+            curl -X POST -i http://localhost:5000/ --data '{
+                "method": "POST", 
+                "path_info": "/api/v5/test/", 
+                "request": {"x": "data"}
+            }' -H "Content-Type: application/json"
+
+        **Example - validate response only**:
+
+        .. code-block:: bash
+
+            curl -X POST -i http://localhost:5000/ --data '{
+                "method": "POST",
+                "path_info": "/api/v5/test/", 
+                "status_code": 200,
+                "response": {"data": {"some": "thing"}}
+            }' -H "Content-Type: application/json"
 
         **Success response**:
 
@@ -53,7 +79,6 @@ def validator():
 
             HTTP/1.0 200 OK
             Content-Type: application/json
-            Content-Length: 66
 
             {
               "message": "All is well with the world (and your fixture)."
@@ -65,16 +90,23 @@ def validator():
 
             HTTP/1.0 400 BAD REQUEST
             Content-Type: application/json
-            Content-Length: 78
 
             {
-              "error": "The requested resource '/dummy/path/' was not found in spec."
+              "error": "The requested resource '/some/path/' was not found in spec."
             }
 
+        **Whitelisted response**:
+
+        .. sourcecode:: http
+
+            HTTP/1.0 200 OK
+            Content-Type: application/json
+
+            {
+              "warning": "Requested endpoint `/some/path/` is whitelisted against validation."
+            }
             
 
-        :return: On success 200 is returned, otherwise 400 with error detail.
-    
         **JSON Schema Definition:**
         
         .. literalinclude:: ../pedantic/pedantic_api.json
