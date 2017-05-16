@@ -82,10 +82,12 @@ def validator():
             {
                 "title": "Pedantic POST API",
                 "type": "object",
+                "additionalProperties": False,
                 "properties": {
                     "path_info": {
                         "description": "Path to the mock resource.",
                         "type": "string",
+                        "pattern": "^/*",
                         "example": "/some/endpoint/"
                     },
                     "method": {
@@ -96,12 +98,12 @@ def validator():
                     "request": {
                         "description": "Payload of mock request.",
                         "type": "object",
-                        "example": { "some_prop": "some_value" }
+                        "example": {"some_prop": "some_value"}
                     },
                     "response": {
                         "description": "Payload of mock response.",
                         "type": "object",
-                        "example": { "data": { "some_prop": "some_value" } }
+                        "example": {"data": {"some_prop": "some_value"}}
                     },
                     "query_string": {
                         "description": "Mock request query string.",
@@ -114,10 +116,10 @@ def validator():
                         "type": "number"
                     }
                 },
-                "required": [ "path_info", "method" ],
-                "oneOf" : [
-                    { "required" : [ "request" ] },
-                    { "required" : [ "response", "status_code" ] }
+                "required": ["path_info", "method"],
+                "anyOf": [
+                    {"required": ["request"]},
+                    {"required": ["response", "status_code"]}
                 ]
             }
     """
