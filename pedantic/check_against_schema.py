@@ -333,12 +333,6 @@ def validate_request_against_schema(data, spec):
 
     # validate request body
     if req_data and 'body' in spec:
-        # `api_key` is not in spec, it is being deprecated, however,
-        # it is present in most requests so we remove it here to allow
-        # `additionalProperties: false`
-        if 'api_key' in req_data:
-            del req_data['api_key']
-
         raw_instance_sch = spec['body']['application/json']['schema']
         instance_schema = json.loads(raw_instance_sch)
         try:
@@ -385,6 +379,7 @@ def validate_response_against_schema(data, spec):
     :param dict spec: the relevant jsonschema definition for the instance
 
     :raises: :class:`.UndefinedSchemaError`
+    :raises: :class:`.JSONSchemaValidationError`
 
     """
     res_status_code = str(data.response.status_code)
