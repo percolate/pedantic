@@ -135,9 +135,10 @@ def _get_path_segments(path_info):
 
 def _get_method_spec_from_resource(endpoint, request):
     req_method = request.method.lower()
-    for method in endpoint['methods']:
-        if method['method'].lower() == req_method:
-            return method
+    if 'methods' in endpoint:
+        for method in endpoint['methods']:
+            if method['method'].lower() == req_method:
+                return method
     raise UndefinedSchemaError(
         "The requested method '{}' for '{}' was not found in spec.".format(
             req_method, request.path))

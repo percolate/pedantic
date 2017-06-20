@@ -118,12 +118,13 @@ def validator():
         error = {'error': msg}
         return jsonify(error), 400
 
-    json = request.get_json()
+    the_json = request.get_json()
     try:
-        data = parse_data(json)
+        print(the_json)
+        data = parse_data(the_json)
     except ValidationError as e:
         err_msg = "Pedantic error{}".format(str(e))
-        msg = {'error': err_msg, 'data': json}
+        msg = {'error': err_msg, 'data': the_json}
         return jsonify(msg), 400
 
     # Get the specific schema under test
@@ -138,6 +139,9 @@ def validator():
                 return jsonify(value), 200
         msg = {'error': str(e)}
         return jsonify(msg), 400
+    except Exception as e:
+        msg = {'error': str(e)}
+        return jsonify(msg), 500
 
     # Validate the request and/or response
     errors = ''
