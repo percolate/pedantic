@@ -120,7 +120,6 @@ def validator():
 
     the_json = request.get_json()
     try:
-        print(the_json)
         data = parse_data(the_json)
     except ValidationError as e:
         err_msg = "Pedantic error{}".format(str(e))
