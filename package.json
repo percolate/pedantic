@@ -1,5 +1,8 @@
 {
+  "name": "@percolate/pedantic",
+  "version": "0.0.0",
+  "private": true,
   "dependencies": {
-    "raml-parser": "0.8.15"
+    "raml-parser": "0.8.18"
   }
 }

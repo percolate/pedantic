@@ -1,2 +1,6 @@
-*!pedantic*
-*!requirements.txt
+# sync with .gitignore
+__pycache__
+.coverage
+.DS_Store
+*.pyc
+tmp/

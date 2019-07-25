@@ -1,0 +1,22 @@
+#%RAML 0.8
+---
+title: Example API
+baseUri: http://example.com
+version: v1
+
+/api/test:
+  post:
+    queryParameters:
+      required_param:
+        required: true
+      optional_param:
+      date_param:
+        type: date
+    body:
+      application/json:
+        schema: "{\n\"additionalProperties\": false,\"properties\":{\n\"x\":{\n\"type\":\"string\"\n},\n\"y\":{\"items\":{\"anyOf\":[{\"type\":\"string\",\"maxLength\":2},{\"minimum\":5,\"type\":\"integer\"}]},\"type\":\"array\",\"maxItems\":2}}\n}"
+    responses:
+      200:
+        body:
+          application/json:
+            schema: '{"properties":{"data":{"type":"object"}}}'
