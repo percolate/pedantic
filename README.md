@@ -1,5 +1,7 @@
 # prclt/pedantic
 
+[![codecov](https://codecov.io/gh/percolate/pedantic/branch/master/graph/badge.svg)](https://codecov.io/gh/percolate/pedantic)
+
 Pedantic allows any client to discover when a fixture no longer complies with a published API.
 
 ## Who is Pedantic for?
