@@ -15,6 +15,8 @@ RUN yarn --modules-folder $NODE_PATH && yarn cache clean
 ENV PORT 5000
 EXPOSE $PORT
 
-COPY bin/pedantic cli/ pedantic/ ./
+COPY bin/pedantic bin/pedantic
+COPY cli/ cli/
+COPY pedantic/ pedantic/
 
 ENTRYPOINT ["bin/pedantic"]
