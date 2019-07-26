@@ -1,20 +1,6 @@
-.DS_Store
-**/.idea/*
-*.pyc
-*.out
-node_modules/
-.tox
-.cache
+# sync with .dockerignore
+__pycache__
 .coverage
-.python-version
-
-# Sphinx side effects
-docs/_build/
-docs/_static/
-docs/_templates/
-
-# Percolate downloaded inputs
-index.raml
-schema.json
-whitelist.json
-
+.DS_Store
+*.pyc
+tmp/

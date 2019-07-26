@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+trap "exit" INT TERM ERR
+trap "kill 0" EXIT
+
+bin/pedantic tests/example_schema.raml --whitelist=file:///pedantic/tests/example_whitelist.json &
+sleep 2
+curl -X POST -i http://localhost:$PORT/ \
+    --data '{"method": "POST", "path_info": "/api/test", "query_string": "required_param=1", "request": {"x": "data"}, "response": {"data": {}}}' \
+    --retry 3 --retry-delay 2 --retry-connrefused \
+    -H "Content-Type: application/json"

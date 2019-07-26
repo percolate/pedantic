@@ -1,6 +1,0 @@
-FROM byrnedo/alpine-curl
-LABEL \
-    Description="This image is used to test connectivity with the running Pedantic Docker image."
-
-ENTRYPOINT curl -X POST -i http://localhost:5000/ --data '{"method": "POST", "path_info": "/dummy/path/", \
-"request": {"x": "data"}}' -H "Content-Type: application/json"

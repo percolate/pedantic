@@ -1,11 +1,20 @@
-# Pedantic
-# Version           0.0.1
+FROM python:3.6-alpine
 
-FROM python:3.6.1-alpine
-LABEL Description="This image is used to start the local Pendantic service." Author="Julien Funk" Version="0.0.1"
+WORKDIR /pedantic
+ENV PYTHONPATH /pedantic
 
-ADD VERSION .
-ADD pedantic/ requirements.txt pedantic.py /
-ADD pedantic/ /pedantic
+RUN apk add --update curl nodejs yarn bash
+
+COPY requirements.txt package.json yarn.lock ./
+
 RUN pip install -r requirements.txt
-ENTRYPOINT ["./pedantic.py", "file_params/schema.json", "--whitelist=file_params/whitelist.json"]
+
+ENV NODE_PATH=/node_modules
+RUN yarn --modules-folder $NODE_PATH && yarn cache clean
+
+ENV PORT 5000
+EXPOSE $PORT
+
+COPY bin/pedantic cli/ pedantic/ ./
+
+ENTRYPOINT ["bin/pedantic"]

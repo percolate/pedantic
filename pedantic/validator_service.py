@@ -19,7 +19,7 @@ from .check_against_schema import (
 app = Flask(__name__)
 
 schema = None
-whiltelist = None
+whitelist = None
 
 
 def set_proxy_settings(schema_arg, whitelist_arg):
@@ -31,7 +31,7 @@ def set_proxy_settings(schema_arg, whitelist_arg):
         whitelist = json.loads(whitelist_arg)
 
 
-@app.route('/', methods=['POST'])
+@app.route("/", methods=["POST"])
 def validator():
     """
     .. http:POST:: /
@@ -113,9 +113,9 @@ def validator():
            :language: json
     """
 
-    if 'application/json' not in request.headers.get('Content-Type'):
-        msg = 'Transport header `Content-Type` must be `application/json`.'
-        error = {'error': msg}
+    if "application/json" not in request.headers.get("Content-Type"):
+        msg = "Transport header `Content-Type` must be `application/json`."
+        error = {"error": msg}
         return jsonify(error), 400
 
     the_json = request.get_json()
@@ -123,7 +123,7 @@ def validator():
         data = parse_data(the_json)
     except ValidationError as e:
         err_msg = "Pedantic error{}".format(str(e))
-        msg = {'error': err_msg, 'data': the_json}
+        msg = {"error": err_msg, "data": the_json}
         return jsonify(msg), 400
 
     # Get the specific schema under test
@@ -132,23 +132,25 @@ def validator():
     except UndefinedSchemaError as e:
         if whitelist:
             if is_whitelisted(data, whitelist):
-                msg = 'Requested endpoint `{}` is whitelisted against ' \
-                      'validation.'.format(data.path)
-                value = {'warning': msg}
+                msg = (
+                    "Requested endpoint `{}` is whitelisted against "
+                    "validation.".format(data.path)
+                )
+                value = {"warning": msg}
                 return jsonify(value), 200
-        msg = {'error': str(e)}
+        msg = {"error": str(e)}
         return jsonify(msg), 400
     except Exception as e:
-        msg = {'error': str(e)}
+        msg = {"error": str(e)}
         return jsonify(msg), 500
 
     # Validate the request and/or response
-    errors = ''
+    errors = ""
     if data.request:
         try:
             validate_request_against_schema(data, spec)
         except JSONSchemaValidationError as e:
-            errors = '{}\n\n'.format(str(e))
+            errors = "{}\n\n".format(str(e))
 
     if data.response:
         try:
@@ -158,8 +160,13 @@ def validator():
 
     # Return the results
     if not errors:
-        msg = {'message': 'All is well with the world (and your fixture).'}
+        msg = {"message": "All is well with the world (and your fixture)."}
         return jsonify(msg), 200
     else:
-        msg = {'error': errors}
+        msg = {"error": errors}
         return jsonify(msg), 400
+
+
+@app.route("/", methods=["GET"])
+def healthcheck():
+    return "OK", 200
